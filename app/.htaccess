@@ -1,1 +1,9 @@
+# Protecting the app folder
+
 deny from all
+
+# To route app/ urls to the framework, rewrite accordingly:
+#
+# RewriteEngine On
+# RewriteBase /
+# RewriteRule ^.*$ index.php [NC,L]
