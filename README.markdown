@@ -1,7 +1,7 @@
 Vultur Framework
 ================
 
-Originally named Condor Framework by me and that's why it uses the CR prefix on it's classes. I changed the name to <acronym title="Vultur gryphus">Vultur</acronym> because it is the scientific name of the Andean Condor.
+Originally named Condor Framework by me and that's why it uses the CR prefix on it's classes. I changed the name to <acronym title="Vultur gryphus">Vultur</acronym> because it is the scientific name of the Andean Condor (Vultur gryphus).
 
 I developed this framework for a personal project and have been using it extensively on client work. I was driven to write Vultur because I wanted to challenge myself to see if I could pull it off and to further develop my PHP and Web development skills. 
 
