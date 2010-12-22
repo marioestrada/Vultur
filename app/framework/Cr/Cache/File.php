@@ -16,7 +16,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 	public function set($name, $value, $options = null)
 	{
 		$filename = $this->getFileName($name);
-		$time = $this->getTimeDelta($options);
+		$time = $this->getTimeDelta($options['time']);
 		
 		$data = array(
 			'expires' => time() + $time, 
