@@ -2,7 +2,7 @@
 
 require_once('Abstract.php');
 require_once('Rediska.php');
-require_once 'Rediska/Key.php';
+require_once('Rediska/Key.php');
 
 class Cr_Cache_Redis extends Cr_Cache_Abstract
 {

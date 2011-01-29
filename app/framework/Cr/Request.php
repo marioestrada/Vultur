@@ -6,6 +6,19 @@
 */
 class Cr_Request
 {
+
+	/* 
+		Function: getAppRoute
+			Return the current internal (redirect or real) route for the application to work with.
+			
+		Returns:
+			*String* containing internal route.			
+	*/
+	static function getAppRoute()
+	{
+		return isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : $_SERVER['REQUEST_URI'];
+	}
+	
 	/* 
 		Function: getRoute
 			Return the current route for the application to work with.
@@ -19,10 +32,10 @@ class Cr_Request
 			return $GLOBALS['CR']['route'];
 		
 		$cr_config = cr_config();
+		$url_path = self::getAppRoute();
+		$qmark_position = strpos($url_path, '?');
 		
-		$qmark_position = strpos($_SERVER['REQUEST_URI'], '?');
-		
-		$route = $qmark_position === false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'], 0, $qmark_position);
+		$route = $qmark_position === false ? $url_path : substr($url_path, 0, $qmark_position);
 		
 		$GLOBALS['CR']['route'] = substr_replace($route, '', 0, strlen($cr_config['app_path']));
 		
@@ -37,8 +50,8 @@ class Cr_Request
 			*String* containing the current _URL_.
 	*/
 	static function getUrl()
-	{	
-		return self::getBaseUrl() . $_SERVER["REQUEST_URI"];
+	{
+		return self::getBaseUrl() . $url_path;
 	}
 	
 	/* 
@@ -47,6 +60,18 @@ class Cr_Request
 			
 		Returns:
 			*String* containing the current _URL_.
+	*/
+	static function getRedirectUrl()
+	{
+		return self::getBaseUrl() . self::getAppRoute();
+	}
+	
+	/* 
+		Function: getAppUrl 
+			Return the current internal _URL_.
+			
+		Returns:
+			*String* containing the current internal _URL_.
 	*/	
 	static function getAppUrl() 
 	{
@@ -57,8 +82,6 @@ class Cr_Request
 	
 	static function getBaseUrl()
 	{
-		$cr_config = cr_config();
-		
 		$url = isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 'https://' : 'http://';
 		
 		if($_SERVER["SERVER_PORT"] != "80")
@@ -96,7 +119,8 @@ class Cr_Request
 			
 			foreach($parts as $value)
 			{
-				$vars[] = $value;
+				if(!empty($value))
+					$vars[] = $value;
 			}
 		}
 		
@@ -317,4 +341,5 @@ class Cr_Request
 	{
 		return $_SERVER['REQUEST_METHOD'] === 'DELETE';
 	}
+
 }
