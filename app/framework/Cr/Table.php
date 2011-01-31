@@ -15,18 +15,33 @@ class Cr_Table{
 		$this->order = empty($order) ? "{$id_field} ASC" : $order;
 	}
 	
+	protected function runPreparedQuery($query, $one = false)
+	{
+		if(is_string(key($query[1])))
+			$statement = $this->db->prepare($query[0], array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		else
+			$statement = $this->db->prepare($query[0]);
+		
+		$statement->execute($query[1]);
+		
+		$this->checkErrors();
+		
+		$method = $one ? 'fetch' : 'fetchAll';
+		$res = $statement->$method(PDO::FETCH_ASSOC);
+		
+		$this->last_query = $query[0];
+		
+		return $res;
+	}
+	
 	protected function runQuery($query, $one = false)
 	{
 		$statement = $this->db->query($query);
 		
 		$this->checkErrors();
 		
-		if($one)
-		{
-			$res = $statement->fetch(PDO::FETCH_ASSOC);
-		}else{
-			$res = $statement->fetchAll(PDO::FETCH_ASSOC);
-		}
+		$method = $one ? 'fetch' : 'fetchAll';
+		$res = $statement->$method(PDO::FETCH_ASSOC);
 		
 		$this->last_query = $query;
 		
@@ -55,29 +70,43 @@ class Cr_Table{
 	}
 	
 	public function getById($id, $fields = '*')
-	{
-		$id = $this->db->quote($id);
-		
-		return $this->runQuery("SELECT {$fields} FROM {$this->table} WHERE {$this->id_field} = {$id}", true);
+	{	
+		return $this->runPreparedQuery(array("SELECT {$fields} FROM {$this->table} WHERE {$this->id_field} = ?", array($id)), true);
 	}
 	
 	public function getByFullQueryAll($query)
 	{
+		if(is_array($query))
+		{
+			return $this->runPreparedQuery($query);
+		}
 		return $this->runQuery($query);
 	}
 	
 	public function getByFullQueryOne($query)
 	{
+		if(is_array($query))
+		{
+			return $this->runPreparedQuery($query, true);
+		}
 		return $this->runQuery($query, true);
 	}
 	
 	public function getByQueryOne($query = "", $fields = '*')
-	{	
+	{
+		if(is_array($query))
+		{
+			return $this->runPreparedQuery(array("SELECT {$fields} FROM {$this->table} {$query[0]}", $query[1]), true);
+		}
 		return $this->runQuery("SELECT {$fields} FROM {$this->table} {$query}", true);
 	}
 	
 	public function getByQueryAll($query = "", $fields = '*')
 	{
+		if(is_array($query))
+		{
+			return $this->runPreparedQuery(array("SELECT {$fields} FROM {$this->table} {$query[0]}", $query[1]));
+		}
 		return $this->runQuery("SELECT {$fields} FROM {$this->table} {$query}");
 	}
 	
@@ -95,13 +124,20 @@ class Cr_Table{
 	
 	public function getByPage($page = 1, $limit = 10, $query = '', $fields = '*')
 	{
-		$page = $page < 1 ? 1 : $page;
-		$limit = $limit < 0 ? 0 : $limit;
+		$page = $page < 1 ? 1 : (int) $page;
+		$limit = $limit < 0 ? 0 : (int) $limit;
 		
-		$where_clause = empty($query) ? '' : "{$query}";
 		$offset = ($page - 1) * $limit;
 		$limit_clause = "{$offset}, {$limit}";
 		
+		if(is_array($query))
+		{
+			$query = array("SELECT {$fields} FROM {$this->table} {$query[0]} LIMIT {$limit_clause}", $query[1]);
+			
+			return $this->runQuery($query);
+		}
+		
+		$where_clause = empty($query) ? '' : $query;
 		$query = "SELECT {$fields} FROM {$this->table} {$where_clause} LIMIT {$limit_clause}";
 		
 		return $this->runQuery($query);

@@ -52,7 +52,7 @@ abstract class Cr_Cache_Abstract
 		return $tags_array;
 	}
 	
-	protected function getTimeDelta($time)
+	protected function getTimeDelta($time = null)
 	{
 		$time = empty($time) ? $this->default_time : $time;
 		

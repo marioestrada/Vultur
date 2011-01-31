@@ -16,7 +16,7 @@ class Cr_Request
 	*/
 	static function getAppRoute()
 	{
-		return isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : $_SERVER['REQUEST_URI'];
+		return isset($_SERVER['REDIRECT_URL']) && !empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : $_SERVER['REQUEST_URI'];
 	}
 	
 	/* 
@@ -341,5 +341,5 @@ class Cr_Request
 	{
 		return $_SERVER['REQUEST_METHOD'] === 'DELETE';
 	}
-
+	
 }

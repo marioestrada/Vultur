@@ -44,7 +44,12 @@ class Cr_View
 	
 	public function escape($data)
 	{
-		echo htmlentities($data);
+		echo htmlentities(stripslashes($data));
+	}
+	
+	public function escapeUrl($data)
+	{
+		echo urlencode($data);
 	}
 	
 	public function embedScripts($scripts, $scripts_url = '', $file_ext = '')
