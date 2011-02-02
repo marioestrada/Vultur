@@ -17,7 +17,7 @@ class Cr_Table{
 	
 	protected function runPreparedQuery($query, $one = false)
 	{
-		if(is_string(key($query[1])))
+		if(!is_string(key($query[1])))
 			$statement = $this->db->prepare($query[0], array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		else
 			$statement = $this->db->prepare($query[0]);
@@ -55,6 +55,23 @@ class Cr_Table{
 		$this->checkErrors();
 		
 		$this->last_query = $query;
+		$this->last_id = $this->db->lastInsertId();
+		
+		return $res;
+	}
+	
+	protected function runPreparedNonQuery($query)
+	{
+		if(!is_string($query[1]))
+			$statement = $this->db->prepare($query[0], array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		else
+			$statement = $this->db->prepare($query[0]);
+		
+		$res = $this->db->execute($query[1]);
+		
+		$this->checkErrors();
+		
+		$this->last_query = $query[0];
 		$this->last_id = $this->db->lastInsertId();
 		
 		return $res;

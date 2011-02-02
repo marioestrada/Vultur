@@ -11,6 +11,7 @@ abstract class Cr_Controller
 	protected $use_layout = true;
 	protected $layout_name;
 	protected $clear_flash = true;
+	protected $_action_response = null;
 	
 	public function __construct($action, $layout_name = 'main')
 	{
@@ -31,7 +32,7 @@ abstract class Cr_Controller
 		{
 			if(method_exists($this, $action) || method_exists($this, '__call'))
 			{
-				$this->$action();
+				$this->_action_response = $this->$action();
 			}else{
 				throw new Exception("Action '{$action}' does not exists for controller '{$this->controller}'.");
 			}
@@ -105,6 +106,15 @@ abstract class Cr_Controller
 	public function showView($view = '', $call_view = false)
 	{
 		$this->call_view = $call_view;
+		
+		if(Cr_Request::isJson())
+		{
+			$this->respondJson($this->_action_response);
+			return;
+		}else if($this->_action_response !== null){
+			echo $this->_action_response;
+			return;
+		}
 		
 		$controller_dir = strtolower(str_replace('Controller', '', $this->controller));
 		$view = empty($view) ? str_replace('Action', '', $this->action) : $view;

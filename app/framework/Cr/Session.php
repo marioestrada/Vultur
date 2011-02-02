@@ -46,7 +46,7 @@ class Cr_Session
 	{
 		if(isset($_SESSION[$this->name]))
 		{
-			foreach($_SESSION[$this->name] as $key -> $item)
+			foreach($_SESSION[$this->name] as $key => $item)
 			{
 				unset($_SESSION[$this->name][$key]);
 			};

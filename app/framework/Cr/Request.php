@@ -16,7 +16,9 @@ class Cr_Request
 	*/
 	static function getAppRoute()
 	{
-		return isset($_SERVER['REDIRECT_URL']) && !empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : $_SERVER['REQUEST_URI'];
+		return isset($GLOBALS['CR']['APP_URL']) ? $GLOBALS['CR']['APP_URL'] :
+					isset($_SERVER['REDIRECT_URL']) && !empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] :
+						$_SERVER['REQUEST_URI'];
 	}
 	
 	/* 
@@ -51,19 +53,19 @@ class Cr_Request
 	*/
 	static function getUrl()
 	{
-		return self::getBaseUrl() . $url_path;
+		return self::getBaseUrl() . self::getAppRoute();
 	}
 	
 	/* 
-		Function: getUrl 
-			Return the current _URL_.
+		Function: getInternalUrl 
+			Return the internal/redirected _URL_.
 			
 		Returns:
-			*String* containing the current _URL_.
+			*String* containing the internal/redirected _URL_.
 	*/
-	static function getRedirectUrl()
+	static function getInternalUrl()
 	{
-		return self::getBaseUrl() . self::getAppRoute();
+		return self::getBaseUrl() . '/' . self::getRoute();
 	}
 	
 	/* 
@@ -153,11 +155,17 @@ class Cr_Request
 			$total = count($parts);
 			for($i = 0; $i < $total; $i += 2)
 			{
-				$vars[$parts[$i]] = isset($parts[$i + 1]) ? addslashes($parts[$i + 1]) : null;
+				if(!empty($parts[$i]))
+					$vars[$parts[$i]] = isset($parts[$i + 1]) ? addslashes($parts[$i + 1]) : null;
 			}
 		}
 		
 		return $vars;
+	}
+	
+	static function getVars()
+	{
+		return self::getVarsFromUrl();
 	}
 	
 	/* 
@@ -340,6 +348,18 @@ class Cr_Request
 	static function isDelete()
 	{
 		return $_SERVER['REQUEST_METHOD'] === 'DELETE';
+	}
+	
+	/*
+		Function: getReferer
+		Get the url referer.
+		
+		Returns:
+			A *string* with the referer _URL_ or *false* if there's no referer.
+	*/
+	static function getReferer()
+	{
+		return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : false;
 	}
 	
 }
