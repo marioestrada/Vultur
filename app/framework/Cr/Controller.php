@@ -109,7 +109,10 @@ abstract class Cr_Controller
 		
 		if(Cr_Request::isJson())
 		{
-			$this->respondJson($this->_action_response);
+			if(!is_null($this->_action_response))
+				$this->respondJson($this->_action_response);
+			else
+				throw new Exception('No response for JSON request.');
 			return;
 		}else if($this->_action_response !== null){
 			echo $this->_action_response;

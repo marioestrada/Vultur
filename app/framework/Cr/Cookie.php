@@ -28,7 +28,7 @@ class Cr_Cookie
 	
 	public function __get($key)
 	{
-		return $_COOKIE[$this->_prefix][$key];
+		return isset($_COOKIE[$this->_prefix][$key]) ? $_COOKIE[$this->_prefix][$key] : null;
 	}
 	
 	public function __isset($key)

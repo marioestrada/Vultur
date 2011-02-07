@@ -38,15 +38,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		$this->writeToFile(array('content' => $tags_array), $filename);
 	}
 	
-	public function deleteByTag($tag)
-	{
-		$filename = $this->getFileName($this->tags_key);
-		$tags_array = $this->_deleteByTag($tag);
-		
-		$this->writeToFile(array('content' => $tags_array), $filename);
-	}
-	
-	public function writeToFile($data, $filename)
+	protected function writeToFile($data, $filename)
 	{
 		$file = fopen($filename, 'w');
 		if(!$file)
@@ -111,9 +103,17 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		}
 	}
 	
+	public function deleteByTag($tag)
+	{
+		$filename = $this->getFileName($this->tags_key);
+		$tags_array = $this->_deleteByTag($tag);
+		
+		$this->writeToFile(array('content' => $tags_array), $filename);
+	}
+	
 	protected function getFileName($name)
 	{
 		return $this->path . $name . $this->extension;
 	}
-		
+
 }

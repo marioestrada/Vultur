@@ -23,8 +23,7 @@ class Cr_Table{
 			$statement = $this->db->prepare($query[0]);
 		
 		$statement->execute($query[1]);
-		
-		$this->checkErrors();
+		$this->checkErrors($statement);
 		
 		$method = $one ? 'fetch' : 'fetchAll';
 		$res = $statement->$method(PDO::FETCH_ASSOC);
@@ -67,9 +66,9 @@ class Cr_Table{
 		else
 			$statement = $this->db->prepare($query[0]);
 		
-		$res = $this->db->execute($query[1]);
+		$res = $statement->execute($query[1]);
 		
-		$this->checkErrors();
+		$this->checkErrors($statement);
 		
 		$this->last_query = $query[0];
 		$this->last_id = $this->db->lastInsertId();
@@ -77,9 +76,11 @@ class Cr_Table{
 		return $res;
 	}
 	
-	private function checkErrors()
+	private function checkErrors(& $obj = null)
 	{
-		if($this->db->errorCode() !== "00000")
+		$obj = is_null($obj) ? $this->db : $obj;
+		
+		if($obj->errorCode() !== '00000')
 		{
 			$error = $this->db->errorInfo();
 			throw new Exception("[{$error[0]}] {$error[2]}");
@@ -87,7 +88,7 @@ class Cr_Table{
 	}
 	
 	public function getById($id, $fields = '*')
-	{	
+	{
 		return $this->runPreparedQuery(array("SELECT {$fields} FROM {$this->table} WHERE {$this->id_field} = ?", array($id)), true);
 	}
 	
@@ -109,7 +110,7 @@ class Cr_Table{
 		return $this->runQuery($query, true);
 	}
 	
-	public function getByQueryOne($query = "", $fields = '*')
+	public function getByQueryOne($query = '', $fields = '*')
 	{
 		if(is_array($query))
 		{
@@ -118,7 +119,7 @@ class Cr_Table{
 		return $this->runQuery("SELECT {$fields} FROM {$this->table} {$query}", true);
 	}
 	
-	public function getByQueryAll($query = "", $fields = '*')
+	public function getByQueryAll($query = '', $fields = '*')
 	{
 		if(is_array($query))
 		{
@@ -127,12 +128,12 @@ class Cr_Table{
 		return $this->runQuery("SELECT {$fields} FROM {$this->table} {$query}");
 	}
 	
-	public function getByQuery($query)
+	public function getByQuery($query = '', $fields = '*')
 	{
-		return $this->getByQueryAll($query);
+		return $this->getByQueryAll($query, $fields);
 	}
 	
-	public function getAll($order = "", $fields = '*')
+	public function getAll($order = '', $fields = '*')
 	{
 		$order_clause = 'ORDER BY ' . (empty($order) ? $this->order : $order);
 		
@@ -149,9 +150,8 @@ class Cr_Table{
 		
 		if(is_array($query))
 		{
-			$query = array("SELECT {$fields} FROM {$this->table} {$query[0]} LIMIT {$limit_clause}", $query[1]);
-			
-			return $this->runQuery($query);
+			$query_do = array("SELECT {$fields} FROM {$this->table} {$query[0]} LIMIT {$limit_clause}", $query[1]);
+			return $this->runPreparedQuery($query_do);
 		}
 		
 		$where_clause = empty($query) ? '' : $query;
@@ -212,11 +212,11 @@ class Cr_Table{
 		return $this->update($data, "WHERE {$this->id_field} = {$id}");
 	}
 	
-	public function total($query = "")
+	public function total($query = '')
 	{
-		$query = "SELECT COUNT(*) as total FROM {$this->table} {$query}";
-		$res = $this->runQuery($query);
-		return $res[0]['total'];
+		$res = $this->getByQueryOne($query, 'COUNT(*) as total');
+		
+		return $res['total'];
 	}
 	
 	public function delete($query)
@@ -235,7 +235,7 @@ class Cr_Table{
 	{
 		if(!is_object($value))
 		{
-			$prepared_value = $value !== '' ? $this->db->quote(htmlspecialchars(trim($value))) : 'NULL';
+			$prepared_value = $value !== null ? $this->db->quote(htmlspecialchars(trim($value))) : 'NULL';
 		}elseif(get_class($value) == 'Cr_DbExpr'){
 			$prepared_value = $value->expresion;
 		}else{

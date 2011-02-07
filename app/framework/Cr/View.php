@@ -4,10 +4,13 @@ class Cr_View
 {
 	private $view_content;
 	private $cr_config;
+	public $template_extension = '.php';
 
 	public function __construct()
 	{
 		$this->cr_config = cr_config();
+		if(isset($this->cr_config['template_extension']))
+			$this->template_extension = $this->cr_config['template_extension'];
 	}
 	
 	public function show($view_path, $use_layout = true, $layout = 'main')
@@ -16,7 +19,7 @@ class Cr_View
 		$this->view_content = $this->getView($view_path);
 		if($use_layout)
 		{
-			include "app/layout/{$layout}.php";
+			include "app/layout/{$layout}{$this->template_extension}";
 		}else{
 			echo $this->view_content;
 		}
@@ -25,7 +28,7 @@ class Cr_View
 	public function getView($view_path)
 	{
 		ob_start();
-		include "app/views/{$view_path}.php";
+		include "app/views/{$view_path}{$this->template_extension}";
 		$res = ob_get_contents();
 		ob_end_clean();
 		
@@ -71,4 +74,5 @@ class Cr_View
 			echo '<option value="', $value, '" ', $attribute, '>', $string, '</option>';
 		}
 	}
+	
 }
