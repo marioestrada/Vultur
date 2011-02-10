@@ -2,12 +2,10 @@
 
 if(isset($argv[1]))
 {
-	$dir_name = dirname(__FILE__) . '/' . $argv[1];
+	$dir_name = './' . $argv[1];
 }else{
 	die('A directory name was not specified.');
 }
-
-chdir('../');
 
 function supercopy($src, $dst)
 { 
@@ -22,12 +20,12 @@ function supercopy($src, $dst)
 
 	    while(($file = readdir($dir)) !== false)
 		{ 
-	        if (( $file != '.' ) && ( $file != '..' )) { 
+	        if (!in_array($file, array('.', '..', '.git', 'README.markdown'))) { 
 	            if ( is_dir($src . '/' . $file) ) { 
-	                supercopy($src . '/' . $file,$dst . '/' . $file); 
+	                supercopy($src . '/' . $file, $dst . '/' . $file); 
 	            } 
 	            else { 
-	                copy($src . '/' . $file,$dst . '/' . $file); 
+	                copy($src . '/' . $file, $dst . '/' . $file); 
 	            } 
 	        } 
 	    }
@@ -40,5 +38,5 @@ function supercopy($src, $dst)
 	return true;
 }
 
-if(supercopy(dirname(__FILE__) . '/cr_resources', $dir_name))
+if(supercopy(dirname(__FILE__), $dir_name))
 	echo "Directory: '{$dir_name}' created succesfully.\n";

@@ -18,6 +18,8 @@ class Cr_Cookie
 	{
 		$seconds = $this->_getTimeDelta(is_array($time) ? $time : $this->_default_time);
 		setcookie($this->_prefix . '[' .  $key . ']', $value, time() + $seconds, $path);
+		
+		return $this;
 	}
 	
 	public function __set($key, $value)

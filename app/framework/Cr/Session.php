@@ -16,7 +16,19 @@ class Cr_Session
 		if(!session_id())
 		{
 			session_start();
-		}	
+		}
+	}
+	
+	public function getId()
+	{
+		return session_id() ? session_id() : false;
+	}
+	
+	public function set($key, $value)
+	{
+		$_SESSION[$this->name][$key] = $value;
+		
+		return $this;
 	}
 	
 	public function __set($key, $value)
@@ -40,6 +52,11 @@ class Cr_Session
 	public function __unset($key)
 	{
 		unset($_SESSION[$this->name][$key]);
+	}
+	
+	public function getList()
+	{
+		return isset($_SESSION[$this->name]) ? $_SESSION[$this->name] : false;
 	}
 	
 	public function clear()

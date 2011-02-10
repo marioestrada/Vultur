@@ -1,0 +1,7 @@
+button,
+label[for]{
+  cursor: pointer;
+}
+button{
+  font-family: sans-serif;
+}

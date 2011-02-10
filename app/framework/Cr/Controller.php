@@ -32,7 +32,8 @@ abstract class Cr_Controller
 		{
 			if(method_exists($this, $action) || method_exists($this, '__call'))
 			{
-				$this->_action_response = $this->$action();
+				$params = Cr_Request::getVarsFromUrl();
+				$this->_action_response = $this->$action($params);
 			}else{
 				throw new Exception("Action '{$action}' does not exists for controller '{$this->controller}'.");
 			}

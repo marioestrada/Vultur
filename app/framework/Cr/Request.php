@@ -84,13 +84,13 @@ class Cr_Request
 	
 	static function getBaseUrl()
 	{
-		$url = isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 'https://' : 'http://';
+		$url = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://';
 		
-		if($_SERVER["SERVER_PORT"] != "80")
+		if($_SERVER['SERVER_PORT'] != '80')
 		{
-			$url .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"];
+			$url .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'];
 		}else{
-			$url .= $_SERVER["SERVER_NAME"];
+			$url .= $_SERVER['SERVER_NAME'];
 		}
 		
 		return $url;
@@ -242,7 +242,7 @@ class Cr_Request
 	
 	static function getActionExtension()
 	{
-		return strtolower(substr(strrchr(self::getAction(true),"."), 1));
+		return strtolower(substr(strrchr(self::getAction(true),'.'), 1));
 	}
 	
 	/*
@@ -362,9 +362,14 @@ class Cr_Request
 		return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : false;
 	}
 	
-	static function getIp()
+	static function getIp($forwarded = true)
 	{
-		return isset($_SERVER["HTTP_X_FORWARDED_FOR"]) ? $_SERVER["HTTP_X_FORWARDED_FOR"] : $_SERVER["REMOTE_ADDR"];
+		return $forwarded && isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+	}
+	
+	static function getTime()
+	{
+		return $_SERVER['REQUEST_TIME'];
 	}
 	
 }
