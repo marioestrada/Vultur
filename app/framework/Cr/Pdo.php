@@ -26,7 +26,8 @@ class Cr_Pdo extends PDO
         }else{
         	throw new Exception('No valid configuration was provided.');
         }
-        
         parent::__construct($dsn, $username, $password, $driver_options);
+        
+        $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 }

@@ -21,11 +21,26 @@ abstract class Cr_Cache_Abstract
 	
 	protected function _addToTags($name, $tags)
 	{
+		if(!is_array($tags) && !is_string($tags))
+			throw new Exception('Tags have to be defined as arrays or a string with comma separated values.');
+		
+		if(is_string($tags))
+		{
+			$tags = explode(',', $tags);
+			foreach($tags as $i => $tag)
+			{
+				$tags[$i] = trim($tag);
+			}
+		}
+		
 		$tags_array = $this->get($this->tags_key);
 		$tags_array = $tags_array ? $tags_array : array();
 		
 		foreach($tags as $tag)
 		{
+			if(!is_string($tag))
+				throw new Exception('Each individual tag needs to be a string.');
+			
 			$tags_array[$tag][] = $name;
 			$tags_array[$tag] = array_unique($tags_array[$tag]);
 		}

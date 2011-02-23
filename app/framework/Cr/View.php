@@ -5,17 +5,22 @@ class Cr_View
 	private $view_content;
 	private $cr_config;
 	public $template_extension = '.php';
+	private $_controller;
+	private $_action;
 
-	public function __construct()
+	public function __construct($controller, $action)
 	{
+		$this->_controller = $controller;
+		$this->_action = $action;
+		
 		$this->cr_config = cr_config();
+		
 		if(isset($this->cr_config['template_extension']))
 			$this->template_extension = $this->cr_config['template_extension'];
 	}
 	
 	public function show($view_path, $use_layout = true, $layout = 'main')
 	{
-		
 		$this->view_content = $this->getView($view_path);
 		if($use_layout)
 		{

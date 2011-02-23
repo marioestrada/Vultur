@@ -61,13 +61,12 @@ class Cr_Table{
 	
 	protected function runPreparedNonQuery($query)
 	{
-		if(!is_string($query[1]))
+		if(!array_key_exists(0, $query[1]))
 			$statement = $this->db->prepare($query[0], array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		else
 			$statement = $this->db->prepare($query[0]);
 		
 		$res = $statement->execute($query[1]);
-		
 		$this->checkErrors($statement);
 		
 		$this->last_query = $query[0];
@@ -199,17 +198,22 @@ class Cr_Table{
 		}
 		$fields = substr($fields, 0, -1);
 		
-		$where_clause = !empty($where) ? $where : '';
+		$where = !empty($where) ? $where : '';
 		
-		$query = "UPDATE {$this->table} SET {$fields} {$where_clause}";
+		if(is_array($where))
+		{
+			$query = "UPDATE {$this->table} SET {$fields} {$where[0]}";
+			return $this->runPreparedNonQuery(array($query, $where[1]));
+		}
+		
+		$query = "UPDATE {$this->table} SET {$fields} {$where}";
 		
 		return $this->runNonQuery($query);
 	}
 	
 	public function updateById($data, $id)
 	{
-		$id = $this->db->quote($id);
-		return $this->update($data, "WHERE {$this->id_field} = {$id}");
+		return $this->update($data, array("WHERE {$this->id_field} = :id", array('id' => $id)));
 	}
 	
 	public function total($query = '')

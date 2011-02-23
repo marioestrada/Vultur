@@ -362,11 +362,40 @@ class Cr_Request
 		return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : false;
 	}
 	
+	/*
+		Function: getIp
+		Get the IP from which the request was made.
+		
+		Parameters:
+			forwarded - *Optional* *Boolean* Determines if it should return the HTTP_X_FORWARDED_FOR header. 
+		
+		Returns:
+			A *string* with the _IP_.
+	*/
 	static function getIp($forwarded = true)
 	{
 		return $forwarded && isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	}
 	
+	/*
+		Function: getUserAgent
+		Get the User Agent from which the request was made.
+		
+		Returns:
+			A *string* with the referer _User Agent_.
+	*/
+	static function getUserAgent($forwarded = true)
+	{
+		return $_SERVER['HTTP_USER_AGENT'];
+	}
+	
+	/*
+		Function: getTime
+		Get the request time from which the request was made.
+		
+		Returns:
+			A unix time stamp with the request time.
+	*/
 	static function getTime()
 	{
 		return $_SERVER['REQUEST_TIME'];

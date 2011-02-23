@@ -15,11 +15,13 @@ abstract class Cr_Controller
 	
 	public function __construct($action, $layout_name = 'main')
 	{
-		$this->view = new Cr_View();
 		$this->controller = get_class($this);
-		
 		$this->action = $action;
 		$this->layout_name = $layout_name;
+		
+		$current_controller = strtolower(str_replace('Controller', '', $this->controller));
+		$current_action = strtolower(str_replace('Action', '', $this->action));
+		$this->view = new Cr_View($current_controller, $current_action);
 		
 		if(Cr_Request::isAjax())
 		{
@@ -111,17 +113,17 @@ abstract class Cr_Controller
 		if(Cr_Request::isJson())
 		{
 			if(!is_null($this->_action_response))
+			{
 				$this->respondJson($this->_action_response);
-			else
-				throw new Exception('No response for JSON request.');
-			return;
+				return;
+			}
 		}else if($this->_action_response !== null){
 			echo $this->_action_response;
 			return;
 		}
 		
 		$controller_dir = strtolower(str_replace('Controller', '', $this->controller));
-		$view = empty($view) ? str_replace('Action', '', $this->action) : $view;
+		$view = empty($view) ? strtolower(str_replace('Action', '', $this->action)) : $view;
 		
 		$this->view->show($controller_dir . '/' . $view, $this->use_layout, $this->layout_name);
 	}

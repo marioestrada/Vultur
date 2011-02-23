@@ -36,4 +36,5 @@ class Cr_File
 	{
 		return in_array(self::getFileExtension($filename), array('png', 'gif', 'jpg', 'jpeg'));
 	}
+	
 }

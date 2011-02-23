@@ -24,7 +24,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		);
 		$this->writeToFile($data, $filename);
 		
-		if(isset($options['tags']) && is_array($options['tags']))
+		if(isset($options['tags']))
 		{
 			$this->addToTags($name, $options['tags']);
 		}
