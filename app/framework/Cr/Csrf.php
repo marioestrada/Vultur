@@ -74,10 +74,10 @@ class Cr_Csrf
 	{
 		if(isset($this->_session) && $this->_checkTime())
 		{
-			$token_exists = isset($_REQUEST['_CSRF']) || isset($_SERVER['X-CSRF-Token']);
+			$token_exists = isset($_REQUEST['_CSRF']) || isset($_SERVER['HTTP_X_CSRF_TOKEN']);
 			if($token_exists)
 			{
-				$token_hash = isset($_REQUEST['_CSRF']) ? $_REQUEST['_CSRF'] : $_SERVER['X-CSRF-Token'];
+				$token_hash = isset($_REQUEST['_CSRF']) ? $_REQUEST['_CSRF'] : $_SERVER['HTTP_X_CSRF_TOKEN'];
 				$token_hash = base64_decode($token_hash);
 				unset($_POST['_CSRF'], $_GET['_CSRF'], $_REQUEST['_CSRF']);
 				

@@ -6,6 +6,8 @@ abstract class Cr_Controller
 {
 	protected $action;
 	protected $controller;
+	protected $action_name;
+	protected $controller_name;
 	protected $view;
 	protected $call_view = true;
 	protected $use_layout = true;
@@ -19,8 +21,8 @@ abstract class Cr_Controller
 		$this->action = $action;
 		$this->layout_name = $layout_name;
 		
-		$current_controller = strtolower(str_replace('Controller', '', $this->controller));
-		$current_action = strtolower(str_replace('Action', '', $this->action));
+		$this->controller_name = $current_controller = strtolower(preg_replace('/Controller$/', '', $this->controller));
+		$this->action_name = $current_action = strtolower(preg_replace('/Action$/', '', $this->action));
 		$this->view = new Cr_View($current_controller, $current_action);
 		
 		if(Cr_Request::isAjax())
@@ -122,8 +124,8 @@ abstract class Cr_Controller
 			return;
 		}
 		
-		$controller_dir = strtolower(str_replace('Controller', '', $this->controller));
-		$view = empty($view) ? strtolower(str_replace('Action', '', $this->action)) : $view;
+		$controller_dir = $this->controller_name;
+		$view = empty($view) ? $this->action_name : $view;
 		
 		$this->view->show($controller_dir . '/' . $view, $this->use_layout, $this->layout_name);
 	}

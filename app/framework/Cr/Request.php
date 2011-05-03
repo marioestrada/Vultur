@@ -39,7 +39,10 @@ class Cr_Request
 		
 		$route = $qmark_position === false ? $url_path : substr($url_path, 0, $qmark_position);
 		
-		$GLOBALS['CR']['route'] = substr_replace($route, '', 0, strlen($cr_config['app_path']));
+		if($cr_config['app_path'] != '/')
+			$GLOBALS['CR']['route'] = substr_replace($route, '', 0, strlen($cr_config['app_path']) + 1);
+		else
+			$GLOBALS['CR']['route'] = substr_replace($route, '', 0, strlen($cr_config['app_path']));
 		
 		return $GLOBALS['CR']['route'];
 	}

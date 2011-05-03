@@ -4,7 +4,7 @@ class Cr_View
 {
 	private $view_content;
 	private $cr_config;
-	public $template_extension = '.php';
+	public $template_extension = '.html.php';
 	private $_controller;
 	private $_action;
 
