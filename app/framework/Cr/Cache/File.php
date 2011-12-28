@@ -5,6 +5,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 {
 	private $extension = '.cache';
 	private $path;
+	private $tags_file;
 	
 	public function __construct($options, $default_time = null)
 	{
@@ -32,23 +33,63 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 	
 	public function addToTags($name, $tags)
 	{
+		$this->_openTagsFile();
+		
 		$filename = $this->getFileName($this->tags_key);
 		$tags_array = $this->_addToTags($name, $tags);
 		
-		$this->writeToFile(array('content' => $tags_array), $filename);
+		$this->writeToFile(array('content' => $tags_array), $filename, true);
+		
+		$this->_closeTagsFile();
 	}
 	
-	protected function writeToFile($data, $filename)
+	private function _openTagsFile()
 	{
-		$file = fopen($filename, 'w');
+		if(isset($this->tags_file))
+			return;
+		
+		$filename = $this->getFileName($this->tags_key);
+		$this->tags_file = fopen($filename, 'c+');
+		
+		if(!$this->tags_file)
+		{
+			throw new Exception('Could not open or create cache file.');
+		}
+
+		flock($this->tags_file, LOCK_EX);
+	}
+	
+	private function _closeTagsFile()
+	{
+		if(isset($this->tags_file))
+		{
+			flock($this->tags_file, LOCK_UN);
+			fclose($this->tags_file);
+			unset($this->tags_file);
+		}
+	}
+	
+	protected function writeToFile($data, $filename, $tags = false)
+	{
+		if(!$tags)
+		{
+			$file = fopen($filename, 'w');
+		}else{
+			$file = & $this->tags_file;
+		}
+		
 		if(!$file)
 		{
 			throw new Exception('Could not open or create cache file.');
 		}
 		
-		flock($file, LOCK_EX);
-		fseek($file,0);
-    	ftruncate($file,0); 
+		if(!$tags)
+		{
+			flock($file, LOCK_EX);
+		}
+		
+		fseek($file, 0);
+    	ftruncate($file, 0);
 		
 		$data = serialize($data);
 		
@@ -57,11 +98,14 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 			throw new Exception('Could not write to cache file.');
 		}
 		
-		flock($file, LOCK_UN);
-		fclose($file);
+		if(!$tags)
+		{
+			flock($file, LOCK_UN);
+			fclose($file);
+		}
 	}
 	
-	public function get($name)
+	public function get($name, $tags = false)
 	{
 		$filename = $this->getFileName($name);
 		
@@ -70,23 +114,32 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 			return false;
 		}
 		
-		$file = fopen($filename, 'r');
-		if(!$file)
-		{
-			return false;
+		if(!$tags)
+		{	
+			$file = fopen($filename, 'r');
+			if(!$file)
+			{
+				return false;
+			}
+			flock($file, LOCK_SH);
+		}else{
+			$file = & $this->tags_file;
 		}
-		flock($file, LOCK_SH);
+
+		$data = @fread($file, filesize($filename));
 		
-		$data = file_get_contents($filename);
-		
-		flock($file, LOCK_UN);
-		fclose($file);
+		if(!$tags)
+		{
+			flock($file, LOCK_UN);
+			fclose($file);
+		}
 		
 		$data = @unserialize($data);
 		
 		if(!$data || ($data && isset($data['expires']) && time() > $data['expires']))
 		{
-			unlink($filename);
+			if(!$tags)
+				unlink($filename);
 			return false;
 		}
 		
@@ -105,10 +158,14 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 	
 	public function deleteByTag($tag)
 	{
+		$this->_openTagsFile();
+		
 		$filename = $this->getFileName($this->tags_key);
 		$tags_array = $this->_deleteByTag($tag);
 		
-		$this->writeToFile(array('content' => $tags_array), $filename);
+		$this->writeToFile(array('content' => $tags_array), $filename, true);
+		
+		$this->_closeTagsFile();
 	}
 	
 	protected function getFileName($name)

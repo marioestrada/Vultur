@@ -33,7 +33,7 @@ abstract class Cr_Cache_Abstract
 			}
 		}
 		
-		$tags_array = $this->get($this->tags_key);
+		$tags_array = $this->get($this->tags_key, true);
 		$tags_array = $tags_array ? $tags_array : array();
 		
 		foreach($tags as $tag)
@@ -54,7 +54,7 @@ abstract class Cr_Cache_Abstract
 	
 	protected function _deleteByTag($tag)
 	{
-		$tags_array = $this->get($this->tags_key);
+		$tags_array = $this->get($this->tags_key, true);
 		if($tags_array && isset($tags_array[$tag]))
 		{
 			foreach($tags_array[$tag] as $i => $name)
