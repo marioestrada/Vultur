@@ -25,7 +25,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		);
 		$this->writeToFile($data, $filename);
 		
-		if(isset($options['tags']))
+		if(!empty($options['tags']))
 		{
 			$this->addToTags($name, $options['tags']);
 		}
@@ -125,9 +125,9 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		}else{
 			$file = & $this->tags_file;
 		}
-
+		
 		$data = file_get_contents($filename);
-
+		
 		if(!$tags)
 		{
 			flock($file, LOCK_UN);
@@ -139,7 +139,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		if(!$data || ($data && isset($data['expires']) && time() > $data['expires']))
 		{
 			if(!$tags)
-				unlink($filename);
+				$this->_deleteFile($filename);
 			return false;
 		}
 		
@@ -150,10 +150,21 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 	{
 		$filename = $this->getFileName($name);
 		
-		if(file_exists($filename) && !unlink($filename))
+		if(file_exists($filename) && !$this->_deleteFile($filename))
 		{
 			throw new Exception('Could not delete cache file.');
 		}
+	}
+	
+	public function _deleteFile($filename)
+	{
+		if(!file_exists($filename))
+			return true;
+		
+		$file = fopen($filename, 'w');
+		flock($file, LOCK_UN);
+		fclose($file);
+		return unlink($filename);
 	}
 	
 	public function deleteByTag($tag)
