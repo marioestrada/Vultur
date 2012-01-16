@@ -126,8 +126,8 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 			$file = & $this->tags_file;
 		}
 
-		$data = @fread($file, filesize($filename));
-		
+		$data = file_get_contents($filename);
+
 		if(!$tags)
 		{
 			flock($file, LOCK_UN);
