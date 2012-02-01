@@ -17,8 +17,8 @@ class Cr_Request
 	static function getAppRoute()
 	{
 		return isset($GLOBALS['CR']['APP_URL']) ? $GLOBALS['CR']['APP_URL'] :
-					isset($_SERVER['REDIRECT_URL']) && !empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] :
-						$_SERVER['REQUEST_URI'];
+					(!empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] :
+						$_SERVER['REQUEST_URI']);
 	}
 	
 	/* 
@@ -56,7 +56,7 @@ class Cr_Request
 	*/
 	static function getUrl()
 	{
-		return self::getBaseUrl() . self::getAppRoute();
+		return self::getBaseUrl() . '/' . self::getAppRoute();
 	}
 	
 	/* 
@@ -89,12 +89,7 @@ class Cr_Request
 	{
 		$url = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://';
 		
-		if($_SERVER['SERVER_PORT'] != '80')
-		{
-			$url .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'];
-		}else{
-			$url .= $_SERVER['SERVER_NAME'];
-		}
+		$url .= $_SERVER['HTTP_HOST'];
 		
 		return $url;
 	}
