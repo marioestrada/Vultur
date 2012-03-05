@@ -42,9 +42,9 @@ class Cr_Base
 		$path_prepared = '^' . str_replace(array('/', '.', '-'), array('\/', '\.', '\-'), $path_prepared) . '$';
 		$this->_routes_paths[] = preg_replace(
 			array(
-				"/~([a-z]+[a-z0-9]*)/i",
-				"/#([a-z]+[a-z0-9]*)/i",
-				"/:([a-z]+[a-z0-9]*)/i"
+				"/~([a-zA-Z]+[a-zA-Z0-9]*)/i",
+				"/#([a-zA-Z]+[a-zA-Z0-9]*)/i",
+				"/:([a-zA-Z]+[a-zA-Z0-9]*)/i"
 			),
 			array(
 				"([a-zA-Z]+)",
@@ -52,7 +52,7 @@ class Cr_Base
 				"([^\/]+)"
 			), $path_prepared);
 		
-		preg_match_all("/[\:\#\~]([a-z]+[a-z\_\-0-9]*)/i", $path, $matches);
+		preg_match_all("/[\:\#\~]([a-zA-Z]+[a-zA-Z\_0-9]*)/i", $path, $matches);
 		
 		if(!empty($matches))
 		{

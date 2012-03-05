@@ -21,10 +21,9 @@ function supercopy($src, $dst)
 	    while(($file = readdir($dir)) !== false)
 		{ 
 	        if (!in_array($file, array('.', '..', '.git', 'README.markdown'))) { 
-	            if ( is_dir($src . '/' . $file) ) { 
+	            if(is_dir($src . '/' . $file)){ 
 	                supercopy($src . '/' . $file, $dst . '/' . $file); 
-	            } 
-	            else { 
+	            }else{ 
 	                copy($src . '/' . $file, $dst . '/' . $file); 
 	            } 
 	        } 
