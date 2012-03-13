@@ -1,5 +1,8 @@
 <?php
+
+require_once('app/framework/Cr/Loader.php');
+$loader = new Cr_Loader();
+
 require('app/bootstrap.php');
-require_once('Cr/Base.php');
 
 Cr_Base::dispatch();

@@ -1,7 +1,5 @@
 <?php
 
-set_include_path('app/framework/' . PATH_SEPARATOR . get_include_path());
-
 require_once('Cr/Ini.php');
 
 function cr_config($part = '')
@@ -17,11 +15,6 @@ function cr_config($part = '')
 	}
 	
 	return $GLOBALS['CR']['config'];
-}
-
-function __autoload($class_name)
-{
-	require_once str_replace('_', '/', $class_name) . '.php';
 }
 
 function fb_log($var)
