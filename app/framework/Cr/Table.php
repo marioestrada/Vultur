@@ -5,6 +5,8 @@ class Cr_Table{
 	public $table;
 	protected $db, $id_field, $order, $fields, $last_query;
 	protected $last_id = null;
+	protected $attributes_blacklist = array();
+	protected $attributes_whitelist = array();
 	
 	public function __construct($table, $db, $id_field = "id", $order = "", $fields = '*')
 	{
@@ -193,6 +195,12 @@ class Cr_Table{
 		$fields = "";
 		foreach($data as $key => $value)
 		{
+			if(!empty($this->attributes_blacklist) && in_array($key, $this->attributes_blacklist))
+				continue;
+			
+			if(!empty($this->attributes_whitelist) && !in_array($key, $this->attributes_whitelist))
+				continue;
+			
 			$value = $value = $this->prepareValue($value);
 			$fields .= "{$key} = {$value},";
 		}
