@@ -21,7 +21,8 @@ class Cr_Loader{
 		}
 		
 		try{
-			require_once str_replace('_', '/', $class_name) . '.php';
+			$filename = str_replace('_', '/', $class_name) . '.php';
+			require_once($filename);
 		}catch(Exception $e){
 		}
 		
