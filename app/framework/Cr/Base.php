@@ -71,7 +71,7 @@ class Cr_Base
 	
 	private function _matchRoute()
 	{
-		$url = Cr_Request::getRoute();
+		$GLOBALS['CR']['APP_URL'] = $url = Cr_Request::getRoute();
 		
 		foreach($this->_routes_paths as $i => $path)
 		{
@@ -86,7 +86,7 @@ class Cr_Base
 				}    
 				$redirect_url = $this->_routes_handlers[$i] . str_replace($tokens, $tokens_replace, $this->_routes_vars[$i]);
 								
-				$GLOBALS['CR']['route'] = $GLOBALS['CR']['APP_URL'] = $redirect_url;
+				$GLOBALS['CR']['route'] = $redirect_url;
 				
 				break;
 			}

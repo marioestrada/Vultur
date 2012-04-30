@@ -99,6 +99,7 @@ class Cr_Table{
 		{
 			return $this->runPreparedQuery($query);
 		}
+		
 		return $this->runQuery($query);
 	}
 	
@@ -108,6 +109,7 @@ class Cr_Table{
 		{
 			return $this->runPreparedQuery($query, true);
 		}
+		
 		return $this->runQuery($query, true);
 	}
 	

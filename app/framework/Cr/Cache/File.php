@@ -136,7 +136,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		
 		$data = @unserialize($data);
 		
-		if(!$data || ($data && isset($data['expires']) && time() > $data['expires']))
+		if($data === false || ($data && isset($data['expires']) && time() > $data['expires']))
 		{
 			if(!$tags)
 				$this->_deleteFile($filename);
