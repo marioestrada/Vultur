@@ -5,7 +5,10 @@ class Cr_Loader{
 	protected $_root_dir = '.';
 	
 	public function __construct($root_dir = 'app/framework/')
-	{
+	{	
+		if(is_array($root_dir))
+			$root_dir = implode(PATH_SEPARATOR, $root_dir);
+		
 		$this->_root_dir = $root_dir;
 
 		set_include_path($root_dir . PATH_SEPARATOR . get_include_path());
