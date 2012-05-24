@@ -31,12 +31,79 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		}
 	}
 	
+	public function get($name, $tags = false)
+	{
+		$filename = $this->getFileName($name);
+		
+		if(!file_exists($filename))
+		{
+			return false;
+		}
+		
+		if(!$tags)
+		{	
+			$file = fopen($filename, 'r');
+			if(!$file)
+			{
+				return false;
+			}
+			flock($file, LOCK_SH);
+		}else{
+			$file = & $this->tags_file;
+		}
+		
+		$data = file_get_contents($filename);
+		
+		if(!$tags)
+		{
+			flock($file, LOCK_UN);
+			fclose($file);
+		}
+		
+		$data = @unserialize($data);
+		
+		if($data === false || ($data && isset($data['expires']) && time() > $data['expires']))
+		{
+			if(!$tags)
+				$this->_deleteFile($filename);
+			
+			return $tags ? array() : false;
+		}
+		
+		if($tags)
+			return !empty($data['content']) ? $data['content'] : array();
+		
+		return !empty($data['content']) ? $data['content'] : true;
+	}
+	
+	public function delete($name)
+	{
+		$filename = $this->getFileName($name);
+		
+		if(file_exists($filename) && !$this->_deleteFile($filename))
+		{
+			throw new Exception('Could not delete cache file.');
+		}
+	}
+	
 	public function addToTags($name, $tags)
 	{
 		$this->_openTagsFile();
 		
 		$filename = $this->getFileName($this->tags_key);
 		$tags_array = $this->_addToTags($name, $tags);
+		
+		$this->writeToFile(array('content' => $tags_array), $filename, true);
+		
+		$this->_closeTagsFile();
+	}
+
+	public function deleteByTag($tag)
+	{
+		$this->_openTagsFile();
+		
+		$filename = $this->getFileName($this->tags_key);
+		$tags_array = $this->_deleteByTag($tag);
 		
 		$this->writeToFile(array('content' => $tags_array), $filename, true);
 		
@@ -68,7 +135,7 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 			unset($this->tags_file);
 		}
 	}
-	
+
 	protected function writeToFile($data, $filename, $tags = false)
 	{
 		if(!$tags)
@@ -105,57 +172,6 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		}
 	}
 	
-	public function get($name, $tags = false)
-	{
-		$filename = $this->getFileName($name);
-		
-		if(!file_exists($filename))
-		{
-			return false;
-		}
-		
-		if(!$tags)
-		{	
-			$file = fopen($filename, 'r');
-			if(!$file)
-			{
-				return false;
-			}
-			flock($file, LOCK_SH);
-		}else{
-			$file = & $this->tags_file;
-		}
-		
-		$data = file_get_contents($filename);
-		
-		if(!$tags)
-		{
-			flock($file, LOCK_UN);
-			fclose($file);
-		}
-		
-		$data = @unserialize($data);
-		
-		if($data === false || ($data && isset($data['expires']) && time() > $data['expires']))
-		{
-			if(!$tags)
-				$this->_deleteFile($filename);
-			return false;
-		}
-		
-		return $data['content'];
-	}
-	
-	public function delete($name)
-	{
-		$filename = $this->getFileName($name);
-		
-		if(file_exists($filename) && !$this->_deleteFile($filename))
-		{
-			throw new Exception('Could not delete cache file.');
-		}
-	}
-	
 	public function _deleteFile($filename)
 	{
 		if(!file_exists($filename))
@@ -167,21 +183,44 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		return unlink($filename);
 	}
 	
-	public function deleteByTag($tag)
-	{
-		$this->_openTagsFile();
-		
-		$filename = $this->getFileName($this->tags_key);
-		$tags_array = $this->_deleteByTag($tag);
-		
-		$this->writeToFile(array('content' => $tags_array), $filename, true);
-		
-		$this->_closeTagsFile();
-	}
-	
 	protected function getFileName($name)
 	{
 		return $this->path . $name . $this->extension;
 	}
+	
+	public function cleanTags()
+	{
+		$this->_openTagsFile();
+		
+		$tags = $this->get($this->tags_key, true);
+		
+		foreach($tags as $i => $tag)
+		{
+			foreach($tag as $j => $item)
+			{
+				if(false === $this->get($item))
+				{
+					unset($tags[$i][$j]);
+				}
+			}
+			if(empty($tags[$i]))
+				unset($tags[$i]);
+		}
 
+		$filename = $this->getFileName($this->tags_key);
+		$this->writeToFile(array('content' => $tags), $filename, true);
+		
+		$this->_closeTagsFile();
+	}
+	
+	public function cleanCache()
+	{
+		$files = glob($this->getFileName('*'));
+		foreach($files as $file)
+		{
+			$info = pathinfo($file);
+			if($info['filename'] !== '_tags')
+				$this->get($info['filename']);
+		}
+	}
 }

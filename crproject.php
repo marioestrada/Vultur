@@ -7,26 +7,36 @@ if(isset($argv[1]))
 	die('A directory name was not specified.');
 }
 
-function supercopy($src, $dst)
+function supercopy($source, $destination)
 { 
-    $dir = opendir($src);
+    $dir = opendir($source);
 
 	try
 	{
-    	if(!file_exists($dst))
+    	if(!file_exists($destination))
 		{
-			mkdir($dst);
+			mkdir($destination);
 		}
+
+		$ignored = array(
+			'.',
+			'..',
+			'.git',
+			'README.markdown',
+			'test',
+			'app/framework/simpletest'
+		);
 
 	    while(($file = readdir($dir)) !== false)
 		{ 
-	        if (!in_array($file, array('.', '..', '.git', 'README.markdown'))) { 
-	            if(is_dir($src . '/' . $file)){ 
-	                supercopy($src . '/' . $file, $dst . '/' . $file); 
+	        if (!in_array($file, $ignored))
+			{
+	            if(is_dir($source . '/' . $file)){ 
+					supercopy($source . '/' . $file, $destination . '/' . $file); 
 	            }else{ 
-	                copy($src . '/' . $file, $dst . '/' . $file); 
-	            } 
-	        } 
+					copy($source . '/' . $file, $destination . '/' . $file); 
+	            }
+	        }
 	    }
 	}catch(Exception $e){
 		die('ERROR: Could not copy all files. ' . $e->getMessage());

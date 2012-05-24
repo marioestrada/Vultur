@@ -105,4 +105,15 @@ abstract class Cr_Cache_Abstract
 		
 		return $time;
 	}
+	
+	public function clean()
+	{
+		$this->cleanTags();
+		$this->cleanCache();
+	}
+	
+	abstract public function cleanCache();
+
+	abstract public function cleanTags();
+	
 }
