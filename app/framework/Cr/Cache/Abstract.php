@@ -41,8 +41,10 @@ abstract class Cr_Cache_Abstract
 			if(!is_string($tag))
 				throw new Exception('Each individual tag needs to be a string.');
 			
-			$tags_array[$tag][] = $name;
-			$tags_array[$tag] = array_unique($tags_array[$tag]);
+			if(!isset($tags_array[$tag]) || (is_array($tags_array[$tag]) && !in_array($name, $tags_array[$tag])))
+			{
+				$tags_array[$tag][] = $name;
+			}
 		}
 		
 		return $tags_array;

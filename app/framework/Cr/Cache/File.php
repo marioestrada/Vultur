@@ -88,26 +88,44 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 	
 	public function addToTags($name, $tags)
 	{
-		$this->_openTagsFile();
-		
-		$filename = $this->getFileName($this->tags_key);
-		$tags_array = $this->_addToTags($name, $tags);
-		
-		$this->writeToFile(array('content' => $tags_array), $filename, true);
-		
-		$this->_closeTagsFile();
+		$this->_modifyTags($name, $tags, 'add');
 	}
 
 	public function deleteByTag($tag)
 	{
+		$this->_modifyTags('', $tag, 'delete');
+	}
+	
+	private function _modifyTags($name, $tags, $type)
+	{
+		$tags_old = $this->get($this->tags_key);
+		$tags_old = !is_array($tags_old) ? array() : $tags_old;
+		
 		$this->_openTagsFile();
 		
 		$filename = $this->getFileName($this->tags_key);
-		$tags_array = $this->_deleteByTag($tag);
 		
-		$this->writeToFile(array('content' => $tags_array), $filename, true);
+		switch($type)
+		{
+			case 'delete':
+				$tags_array = $this->_deleteByTag($tags);
+				break;
+				
+			case 'add':
+			default:
+				$tags_array = $this->_addToTags($name, $tags);
+		}
+		
+		$tags_diff = $this->_compare_array($tags_array, $tags_old);
+		if(!empty($tags_diff) > 0)
+			$this->writeToFile(array('content' => $tags_array), $filename, true);
 		
 		$this->_closeTagsFile();
+	}
+	
+	private function _compare_array($a, $b)
+	{
+		return array_diff($a, $b) + array_diff($b, $a);
 	}
 	
 	private function _openTagsFile()
