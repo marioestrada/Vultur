@@ -5,6 +5,7 @@ abstract class Cr_Cache_Abstract
 	protected $options;
 	protected $default_time;
 	protected $tags_key = '_tags';
+	protected $tags_modified = false;
 	
 	public function __construct($options, $default_time = null)
 	{
@@ -12,12 +13,15 @@ abstract class Cr_Cache_Abstract
 		$this->default_time = $default_time;
 	}
 	
-	
 	abstract public function set($name, $value, $options = null);
 	
 	abstract public function get($name);
 	
-	abstract public function addToTags($name, $tags);
+	//abstract public function addToTags($name, $tags);
+	
+	abstract public function delete($name);
+	
+	abstract public function deleteByTag($tag);
 	
 	protected function _addToTags($name, $tags)
 	{
@@ -44,15 +48,12 @@ abstract class Cr_Cache_Abstract
 			if(!isset($tags_array[$tag]) || (is_array($tags_array[$tag]) && !in_array($name, $tags_array[$tag])))
 			{
 				$tags_array[$tag][] = $name;
+				$this->tags_modified = true;
 			}
 		}
 		
 		return $tags_array;
 	}
-	
-	abstract public function delete($name);
-	
-	abstract public function deleteByTag($tag);
 	
 	protected function _deleteByTag($tag)
 	{
@@ -63,6 +64,7 @@ abstract class Cr_Cache_Abstract
 			{
 				$this->delete($name);
 				unset($tags_array[$tag][$i]);
+				$this->tags_modified = true;
 			}
 		}
 		
@@ -110,12 +112,9 @@ abstract class Cr_Cache_Abstract
 	
 	public function clean()
 	{
-		$this->cleanTags();
 		$this->cleanCache();
 	}
 	
 	abstract public function cleanCache();
-
-	abstract public function cleanTags();
 	
 }

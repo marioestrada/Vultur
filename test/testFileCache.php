@@ -6,7 +6,7 @@ $loader = new Cr_Loader('../app/framework/');
 require_once('../app/framework/simpletest/autorun.php');
 
 class TestFileCache extends UnitTestCase
-{
+{	
 	public function __construct()
 	{
 		$this->cache = new Cr_Cache_File(array('path' => './data/', 'time' => array('seconds' => '1')));
@@ -51,13 +51,7 @@ class TestFileCache extends UnitTestCase
 		$tags2 = array($tag_name_dynamic, 'tag_name_2');
 		$cache->set($test_name, $data, array('tags' => $tags));
 		$cache->set($test_name . '_2', $data, array('tags' => $tags2));
-		
-		$tags_cache = $cache->get('_tags');
-		foreach($tags as $tag)
-		{
-			$this->assertTrue(array_key_exists($tag, $tags_cache));
-		}
-		
+				
 		$data_cache = $cache->get($test_name);
 		$this->assertIdentical($data_cache, $data);
 		
@@ -80,12 +74,8 @@ class TestFileCache extends UnitTestCase
 		
 		sleep(1);
 		
-		$cache->cleanCache();
+		$cache->clean();
 		$files = glob('./data/*.cache');
-		$this->assertTrue(count($files) === 1);
-
-		$cache->cleanTags();
-		$tags_cache = $cache->get('_tags');
-		$this->assertFalse(empty($tags_cache));
+		$this->assertTrue(empty($files));
 	}
 }
