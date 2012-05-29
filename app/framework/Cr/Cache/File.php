@@ -74,9 +74,9 @@ class Cr_Cache_File extends Cr_Cache_Abstract
 		}
 		
 		if($tags)
-			return !empty($data['tags']) ? $data : false;
+			return $data;
 		
-		return !empty($data['content']) ? $data['content'] : true;
+		return $data['content'];
 	}
 	
 	public function delete($name)
