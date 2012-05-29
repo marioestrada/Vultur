@@ -1,4 +1,5 @@
 <?php
+require_once('Abstract.php');
 
 class Cr_Cache_File extends Cr_Cache_Abstract
 {
